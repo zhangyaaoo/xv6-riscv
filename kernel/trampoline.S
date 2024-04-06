@@ -6,7 +6,7 @@
         # at the same virtual address (TRAMPOLINE)
         # in user and kernel space so that it continues
         # to work when it switches page tables.
-        # kernel.ld causes this code to start at 
+        # kernel.ld causes this code to start at
         # a page boundary.
         #
 
@@ -18,7 +18,7 @@
 trampoline:
 .align 4
 .globl uservec
-uservec:    
+uservec:
 	#
         # trap.c sets stvec to point here, so
         # traps from user space start here,
@@ -34,7 +34,7 @@ uservec:
         # but it's mapped to the same virtual address
         # (TRAPFRAME) in every process's user page table.
         li a0, TRAPFRAME
-        
+
         # save the user registers in TRAPFRAME
         sd ra, 40(a0)
         sd sp, 48(a0)
@@ -67,14 +67,16 @@ uservec:
         sd t5, 272(a0)
         sd t6, 280(a0)
 
-	# save the user a0 in p->trapframe->a0
+	# save the user a0 in p->trapframe->a0, see struct trapframe at proc.h
         csrr t0, sscratch
         sd t0, 112(a0)
 
         # initialize kernel stack pointer, from p->trapframe->kernel_sp
+        # 进程创建时，第一次返回用户态之前，需要设置进程对应内核态线程的栈指针
         ld sp, 8(a0)
 
         # make tp hold the current hartid, from p->trapframe->kernel_hartid
+        # 进程创建时，第一次返回用户态之前设置
         ld tp, 32(a0)
 
         # load the address of usertrap(), from p->trapframe->kernel_trap
@@ -145,7 +147,7 @@ userret:
 
 	# restore user a0
         ld a0, 112(a0)
-        
+
         # return to user mode and user pc.
         # usertrapret() set up sstatus and sepc.
         sret

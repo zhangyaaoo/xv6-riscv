@@ -79,6 +79,7 @@ timerinit()
   w_mscratch((uint64)scratch);
 
   // set the machine-mode trap handler.
+  // 这里需要搞清楚，start()不是已经把异常和中断都委托到S模式下了么？为什么这里还需要设置mtvec MIE mie
   w_mtvec((uint64)timervec);
 
   // enable machine-mode interrupts.

@@ -19,7 +19,7 @@ trampoline:
 .align 4
 .globl uservec
 uservec:
-	#
+        #
         # trap.c sets stvec to point here, so
         # traps from user space start here,
         # in supervisor mode, but with a
@@ -67,7 +67,7 @@ uservec:
         sd t5, 272(a0)
         sd t6, 280(a0)
 
-	# save the user a0 in p->trapframe->a0, see struct trapframe at proc.h
+        # save the user a0 in p->trapframe->a0, see struct trapframe at proc.h
         csrr t0, sscratch
         sd t0, 112(a0)
 
@@ -145,7 +145,7 @@ userret:
         ld t5, 272(a0)
         ld t6, 280(a0)
 
-	# restore user a0
+        # restore user a0
         ld a0, 112(a0)
 
         # return to user mode and user pc.

@@ -10,7 +10,18 @@ r_mhartid()
 }
 
 // Machine Status Register, mstatus
-
+//
+// 63                                          12 11            4     0
+// +------------------------------------------+-----+---------+---+---+
+// |                                          | MPP |         |MIE|   |
+// |                                          |[1:0]|         |   |   |
+// +------------------------------------------+-----+---------+---+---+
+//                                               2              1
+//                                            +---+--------+
+//                                            |11 | M-mode |
+//                                            |01 | S-mode |
+//                                            |00 | U-mode |
+//                                            +---+--------+
 #define MSTATUS_MPP_MASK (3L << 11) // previous mode.
 #define MSTATUS_MPP_M (3L << 11)
 #define MSTATUS_MPP_S (1L << 11)
@@ -25,7 +36,7 @@ r_mstatus()
   return x;
 }
 
-static inline void 
+static inline void
 w_mstatus(uint64 x)
 {
   asm volatile("csrw mstatus, %0" : : "r" (x));
@@ -34,7 +45,7 @@ w_mstatus(uint64 x)
 // machine exception program counter, holds the
 // instruction address to which a return from
 // exception will go.
-static inline void 
+static inline void
 w_mepc(uint64 x)
 {
   asm volatile("csrw mepc, %0" : : "r" (x));
@@ -56,7 +67,7 @@ r_sstatus()
   return x;
 }
 
-static inline void 
+static inline void
 w_sstatus(uint64 x)
 {
   asm volatile("csrw sstatus, %0" : : "r" (x));
@@ -71,13 +82,19 @@ r_sip()
   return x;
 }
 
-static inline void 
+static inline void
 w_sip(uint64 x)
 {
   asm volatile("csrw sip, %0" : : "r" (x));
 }
-
 // Supervisor Interrupt Enable
+//
+//  15       10  9   8       6  5   4       2  1   0
+// +-----------+----+---------+----+---------+----+-+
+// |     0     |SEIE|    0    |STIE|    0    |SSIE|0|
+// +-----------+----+---------+----+---------+----+-+
+//       6       1       3      1       3      1   1
+//       Standard portion (bit 15:0) of sie
 #define SIE_SEIE (1L << 9) // external
 #define SIE_STIE (1L << 5) // timer
 #define SIE_SSIE (1L << 1) // software
@@ -89,7 +106,7 @@ r_sie()
   return x;
 }
 
-static inline void 
+static inline void
 w_sie(uint64 x)
 {
   asm volatile("csrw sie, %0" : : "r" (x));
@@ -107,7 +124,7 @@ r_mie()
   return x;
 }
 
-static inline void 
+static inline void
 w_mie(uint64 x)
 {
   asm volatile("csrw mie, %0" : : "r" (x));
@@ -116,7 +133,7 @@ w_mie(uint64 x)
 // supervisor exception program counter, holds the
 // instruction address to which a return from
 // exception will go.
-static inline void 
+static inline void
 w_sepc(uint64 x)
 {
   asm volatile("csrw sepc, %0" : : "r" (x));
@@ -139,7 +156,7 @@ r_medeleg()
   return x;
 }
 
-static inline void 
+static inline void
 w_medeleg(uint64 x)
 {
   asm volatile("csrw medeleg, %0" : : "r" (x));
@@ -154,7 +171,7 @@ r_mideleg()
   return x;
 }
 
-static inline void 
+static inline void
 w_mideleg(uint64 x)
 {
   asm volatile("csrw mideleg, %0" : : "r" (x));
@@ -162,7 +179,7 @@ w_mideleg(uint64 x)
 
 // Supervisor Trap-Vector Base Address
 // low two bits are mode.
-static inline void 
+static inline void
 w_stvec(uint64 x)
 {
   asm volatile("csrw stvec, %0" : : "r" (x));
@@ -177,7 +194,7 @@ r_stvec()
 }
 
 // Machine-mode interrupt vector
-static inline void 
+static inline void
 w_mtvec(uint64 x)
 {
   asm volatile("csrw mtvec, %0" : : "r" (x));
@@ -203,7 +220,7 @@ w_pmpaddr0(uint64 x)
 
 // supervisor address translation and protection;
 // holds the address of the page table.
-static inline void 
+static inline void
 w_satp(uint64 x)
 {
   asm volatile("csrw satp, %0" : : "r" (x));
@@ -217,7 +234,7 @@ r_satp()
   return x;
 }
 
-static inline void 
+static inline void
 w_mscratch(uint64 x)
 {
   asm volatile("csrw mscratch, %0" : : "r" (x));
@@ -242,7 +259,7 @@ r_stval()
 }
 
 // Machine-mode Counter-Enable
-static inline void 
+static inline void
 w_mcounteren(uint64 x)
 {
   asm volatile("csrw mcounteren, %0" : : "r" (x));
@@ -305,7 +322,7 @@ r_tp()
   return x;
 }
 
-static inline void 
+static inline void
 w_tp(uint64 x)
 {
   asm volatile("mv tp, %0" : : "r" (x));

@@ -34,6 +34,10 @@ start()
   w_satp(0);
 
   // delegate all interrupts and exceptions to supervisor mode.
+  // 需要注意的是: 这里被委托的中断只有 SSI STI SEI, M-mode 下的中断是无法被委托到 S-mode 下处理的.
+  // 顾名思义: MSI MTI MEI 这些中断是运行在 M-mode 时产生的中断。
+  // Traps never transition from a more-privileged mode to a less-privileged mode. --- from riscv-privileged spec
+  // 所以, M-mode 下的中断是无法被委托到 S-mode 下处理的.
   w_medeleg(0xffff);
   w_mideleg(0xffff);
   w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
@@ -79,7 +83,8 @@ timerinit()
   w_mscratch((uint64)scratch);
 
   // set the machine-mode trap handler.
-  // 这里需要搞清楚，start()不是已经把异常和中断都委托到S模式下了么？为什么这里还需要设置mtvec MIE mie
+  // MTI 触发时, 特权级切到 M-mode, 并跳转到 timervec 执行. 在 timervec 中, 设置 sip.stip 触发 STI 中断.
+  // mtime 和 mtimecmp 只有在 M-mode 下才能访问.
   w_mtvec((uint64)timervec);
 
   // enable machine-mode interrupts.

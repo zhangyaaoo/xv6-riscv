@@ -43,6 +43,19 @@ binit(void)
   // Create linked list of buffers
   bcache.head.prev = &bcache.head;
   bcache.head.next = &bcache.head;
+
+  /* init:
+   * ┌───┐
+   * │   ▼
+   * │  head
+   * │ ┌────┐
+   * └─┤ p  │
+   *   ├────┤
+   *   │  n ├─┐
+   *   └────┘ │
+   *      ▲   │
+   *      └───┘
+   */
   for(b = bcache.buf; b < bcache.buf+NBUF; b++){
     b->next = bcache.head.next;
     b->prev = &bcache.head;
@@ -50,6 +63,31 @@ binit(void)
     bcache.head.next->prev = b;
     bcache.head.next = b;
   }
+
+  /* after first loop:
+   * ┌───────────────┐
+   * │               ▼
+   * │  head        buf[0]
+   * │ ┌────┐      ┌────┐
+   * └─┤ p  │◄─────┤ p  │
+   *   ├────┤      ├────┤
+   *   │  n ├─────►│  n ├─┐
+   *   └────┘      └────┘ │
+   *      ▲               │
+   *      └───────────────┘
+   *
+   * after second loop:
+   * ┌───────────────────────────┐
+   * │                           ▼
+   * │  head        buf[1]      buf[0]
+   * │ ┌────┐      ┌────┐      ┌────┐
+   * └─┤ p  │◄─────┤ p  │◄─────┤ p  │
+   *   ├────┤      ├────┤      ├────┤
+   *   │  n ├─────►│  n ├─────►│  n ├─┐
+   *   └────┘      └────┘      └────┘ │
+   *      ▲                           │
+   *      └───────────────────────────┘
+   */
 }
 
 // Look through buffer cache for block on device dev.
@@ -132,7 +170,7 @@ brelse(struct buf *b)
     bcache.head.next->prev = b;
     bcache.head.next = b;
   }
-  
+
   release(&bcache.lock);
 }
 

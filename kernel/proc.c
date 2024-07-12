@@ -234,7 +234,7 @@ userinit(void)
 {
   struct proc *p;
 
-  p = allocproc();
+  p = allocproc(); // return with p->lock held.
   initproc = p;
 
   // allocate one user page and copy initcode's instructions

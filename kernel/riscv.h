@@ -352,7 +352,13 @@ typedef uint64 *pagetable_t; // 512 PTEs
 #define PGSIZE 4096 // bytes per page
 #define PGSHIFT 12  // bits of offset within a page
 
+// 以页为单位，向上取整:
+//   0x1000 -> 0x1000
+//   0x1001 -> 0x2000
 #define PGROUNDUP(sz)  (((sz)+PGSIZE-1) & ~(PGSIZE-1))
+// 以页为单位，向下取整:
+//   0x1000 -> 0x1000
+//   0x1001 -> 0x1000
 #define PGROUNDDOWN(a) (((a)) & ~(PGSIZE-1))
 
 #define PTE_V (1L << 0) // valid
